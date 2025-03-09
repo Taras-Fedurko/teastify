@@ -77,7 +77,7 @@ export async function signInAction(
     });
 
     return {
-      redirect: routes.dashboard,
+      redirect: routes.landing,
       message: '',
       success: true,
     };

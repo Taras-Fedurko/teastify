@@ -70,7 +70,7 @@ export async function signUpAction(
       console.log('ENABLE_SIGN_UP_EMEAIL_VERIFICATION');
       
       return {
-        redirect: routes.project.new,
+        redirect: routes.landing,
         success: true,
         message: "User created"
       };

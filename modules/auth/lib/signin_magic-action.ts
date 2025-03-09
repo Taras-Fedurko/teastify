@@ -1,8 +1,7 @@
 "use server";
-import {
-  isRedirectError,
-  RedirectError,
-} from "next/dist/client/components/redirect";
+// eslint-disable-next-line
+// @ts-expect-error
+import { isRedirectError, RedirectError } from "next/dist/client/components/redirect";
 import { HOST } from "@/modules/auth/constants";
 import { reCaptchaSiteVerify } from "./recaptcha";
 import { MagicSignInType } from "../auth.schema";
@@ -59,6 +58,6 @@ const handleSignInRedirectError = (
       `${HOST}/auth/verify-request?email=${data.email}&provider=http-email&type=email;303`;
   }
 
-  let err = { ...error, digest };
+  const err = { ...error, digest };
   throw err;
 };

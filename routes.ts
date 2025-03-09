@@ -15,20 +15,6 @@ export const routes = {
     verifyRequest: "/verify-request",
     authError: "/auth-error", 
   },
-
-  dashboard: '/dashboard',
-
-  project: {
-    projects: 'project',
-    project: '/project/:projectId',
-    new: '/project-new',
-    posts: '/project/:projectId/posts',
-    postNew: '/project/:projectId/posts/new',
-    settings: '/project/:projectId/settings',
-    team: '/project/:projectId/settings/team',
-    // billing: '/project/:projectId/settings/billing',
-    // limits: '/project/:projectId/settings/limits',
-  }
 }
 
 /**
@@ -62,7 +48,7 @@ export const authRoutes: string[] = [
  /**
   * The default route to redirect to after login
   */
- export const DEFAULT_LOGIN_REDIRECT = routes.dashboard;
+ export const DEFAULT_LOGIN_REDIRECT = routes.landing;
  
 /**
  * 
@@ -76,48 +62,3 @@ const matchParams = (route: string, params: Record<string, string>): string => {
     return path.replace(regex, params[key]);
   }, route);
 };
-
-/**
- * Returm projest route
- * @param projectId 
- * @returns 
- */
-export const getProjectRoute = (projectId: string): string => {
-  return matchParams(routes.project.project, { projectId });
-}
-
-/**
- * Return project post route
- * @param projectId 
- * @returns 
- */
-export const getProjectPostsRoute = (projectId: string) => {
-  return matchParams(routes.project.posts, { projectId });
-}
-
-/**
- * Route to create new post
- * @param projectId 
- * @returns 
- */
-export const getProjectPostsNewRoute = (projectId: string) => {
-  return matchParams(routes.project.postNew, { projectId });
-}
-
-/**
-* Returm projest setting route
- * @param projectId 
- * @returns 
- */
-export const getProjectSettingRoute = (projectId: string): string => {
-  return matchParams(routes.project.settings, { projectId });
-}
-
-/**
-* Returm projest setting route
- * @param projectId 
- * @returns 
- */
-export const getProjectTeamRoute = (projectId: string): string => {
-  return matchParams(routes.project.team, { projectId });
-}
