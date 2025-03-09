@@ -1,4 +1,3 @@
-import { SidebarTrigger } from "@/components/ui/sidebar";
 import {
   Breadcrumb,
   BreadcrumbItem,
@@ -21,7 +20,6 @@ export default function BreadcrumbHeader({ children, breadcrumbs, withSidebarTog
       <div className="flex items-center gap-2 px-4">
         {withSidebarToggle && (
           <>
-            <SidebarTrigger className="-ml-1" />
             <Separator orientation="vertical" className="mr-2 h-4" />
           </>
         )}

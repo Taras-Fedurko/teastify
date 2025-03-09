@@ -1,6 +1,13 @@
 {
-  "/page": "app/page.js",
   "/favicon.ico/route": "app/favicon.ico/route.js",
   "/api/auth/[...nextauth]/route": "app/api/auth/[...nextauth]/route.js",
-  "/_not-found/page": "app/_not-found/page.js"
+  "/_not-found/page": "app/_not-found/page.js",
+  "/landing/page": "app/landing/page.js",
+  "/page": "app/page.js",
+  "/(auth)/email_verify/page": "app/(auth)/email_verify/page.js",
+  "/(auth)/forgot-password/page": "app/(auth)/forgot-password/page.js",
+  "/(auth)/new-password/page": "app/(auth)/new-password/page.js",
+  "/(auth)/verify-request/page": "app/(auth)/verify-request/page.js",
+  "/(auth)/sign-in/page": "app/(auth)/sign-in/page.js",
+  "/(auth)/sign-up/page": "app/(auth)/sign-up/page.js"
 }

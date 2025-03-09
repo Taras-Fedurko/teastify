@@ -9,11 +9,7 @@ export const metadata: Metadata = {
   description: 'Create your Content Stream account to manage, schedule, and post content with ease.',
 };
 
-interface Props {
-  searchParams: Record<string, number | string | null>;
-}
-
-export default async function SignUpPage({ searchParams }: Props) {
+export default async function SignUpPage({ searchParams }: { searchParams: Promise<Record<string, number | string | null>> }) {
   const qs = await searchParams;
 
   return (

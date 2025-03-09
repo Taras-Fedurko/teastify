@@ -5,13 +5,7 @@ import { routes } from '@/routes'
 import { ArrowLeftIcon } from '@radix-ui/react-icons'
 import Link from 'next/link'
 
-interface ResetPasswordProps {
-  searchParams: { 
-    token? : string
-  }
-}
-
-export default async function NewPasswordPage({ searchParams } : ResetPasswordProps) {
+export default async function NewPasswordPage({ searchParams }: { searchParams: Promise<{ token?: string | undefined }> }) {
   const { token } = await searchParams;
   
   return (

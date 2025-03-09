@@ -2,9 +2,9 @@ import { routes } from "@/routes";
 import Link from "next/link";
 
 interface VerifyRequestProps {
-  searchParams: {
+  searchParams: Promise<{
     email?: string;
-  };
+  }>;
 }
 
 export default async function VerifyRequest({ searchParams }: VerifyRequestProps) {

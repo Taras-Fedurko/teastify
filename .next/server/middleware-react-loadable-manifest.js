@@ -1,1 +1,1 @@
-self.__REACT_LOADABLE_MANIFEST="{}"
+self.__REACT_LOADABLE_MANIFEST='{"modules/auth/components/SignIn/index.tsx -> ./MagicLinkSignin":{"id":1472,"files":["static/chunks/472.4ee128232ecc1400.js"]}}';
