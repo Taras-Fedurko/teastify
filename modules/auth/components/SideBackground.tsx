@@ -6,11 +6,10 @@ export default function SideBackground() {
 
       <div className="relative z-10 flex h-screen w-full flex-col items-center justify-center p-8">
         <div className="mb-16 mt-8 w-full text-center">
-          <h5 className="text-4xl font-bold text-white">Content Stream</h5>
+          <h5 className="text-4xl font-bold text-white">Teastify</h5>
         </div>
         <div className="max-w-[600px] text-center text-2xl font-bold text-white">
-          A unified dashboard to manage, schedule, and post content across streaming and social platforms,
-          streamlining your workflow and maximizing audience reach.
+          Some description
         </div>
       </div>
     </div>
