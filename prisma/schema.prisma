@@ -3,28 +3,35 @@ generator client {
 }
 
 datasource db {
-  provider = "postgresql"
-  url      = env("POSTGRES_PRISMA_URL")
+  provider  = "postgresql"
+  url       = env("POSTGRES_URL")
   directUrl = env("POSTGRES_URL_NON_POOLING")
 }
 
 model User {
-  id            String        @default(cuid()) @id
+  id            String        @id @default(cuid())
   name          String?
   email         String        @unique
   emailVerified DateTime?
   password      String
-
-  timeFormat    String?       @map(name: "time_format")
-  timeZone      String?       @map(name: "time_zone")
-
-  createdAt     DateTime      @default(now()) @map(name: "created_at")
-  updatedAt     DateTime      @updatedAt      @map(name: "updated_at")
-
   role          UserRolesEnum @default(USER)
-  
-  accounts      Account[]
-  sessions      Session[]
+
+  timeFormat String? @map(name: "time_format")
+  timeZone   String? @map(name: "time_zone")
+
+  createdAt DateTime @default(now()) @map(name: "created_at")
+  updatedAt DateTime @updatedAt @map(name: "updated_at")
+
+  accounts          Account[]
+  sessions          Session[]
+  profile           UserProfile?
+  recipes           Recipe[]
+  mealPlans         MealPlan[]
+  shoppingLists     ShoppingList[]
+  nutritionJournals NutritionJournal[]
+  communityPosts    CommunityPost[]
+  feedback          Feedback[]
+  favorites         FavoriteRecipe[]
 
   @@map(name: "users")
 }
@@ -41,10 +48,10 @@ model Account {
   scope             String?
   id_token          String?
   session_state     String?
-  createdAt         DateTime  @default(now()) @map(name: "created_at")
-  updatedAt         DateTime  @updatedAt      @map(name: "updated_at")
+  createdAt         DateTime @default(now()) @map(name: "created_at")
+  updatedAt         DateTime @updatedAt @map(name: "updated_at")
 
-  user              User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@id([provider, providerAccountId])
   @@map("account")
@@ -56,8 +63,8 @@ model Session {
   expires      DateTime
   user         User     @relation(fields: [userId], references: [id], onDelete: Cascade)
 
-  createdAt    DateTime @default(now()) @map(name: "created_at")
-  updatedAt    DateTime @updatedAt      @map(name: "updated_at")
+  createdAt DateTime @default(now()) @map(name: "created_at")
+  updatedAt DateTime @updatedAt @map(name: "updated_at")
 
   @@map("session")
 }
@@ -81,8 +88,311 @@ model ResetPasswordToken {
   @@map("reset-password-token")
 }
 
+model UserProfile {
+  id                   String   @id @default(cuid())
+  userId               String   @unique
+  bio                  String?  @db.Text
+  avatarUrl            String?
+  preferences          Json? // Storing user preferences as JSON
+  dietaryRestrictions  Json? // Storing dietary restrictions as JSON
+  notificationSettings Json? // Notification preferences
+  createdAt            DateTime @default(now()) @map(name: "created_at")
+  updatedAt            DateTime @updatedAt @map(name: "updated_at")
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@map(name: "user_profiles")
+}
+
+model Recipe {
+  id              String               @id @default(cuid())
+  slug            String               @unique // URL-friendly identifier
+  title           String               @db.VarChar(255)
+  description     String?              @db.Text
+  instructions    String               @db.Text
+  ingredients     Json // Structured JSON for ingredients
+  imageUrl        String?
+  preparationTime Int // in minutes
+  cookingTime     Int // in minutes
+  servings        Int
+  calories        Int?
+  difficulty      RecipeDifficultyEnum @default(MEDIUM)
+  status          RecipeStatusEnum     @default(DRAFT)
+
+  // Nutritional information
+  nutritionInfo Json? // Detailed nutrition info
+
+  // Metadata
+  tags         String[] // Array of tags for better search
+  cuisine      String? // Type of cuisine
+  isVegetarian Boolean  @default(false)
+  isVegan      Boolean  @default(false)
+  isGlutenFree Boolean  @default(false)
+
+  // Stats
+  viewCount     Int    @default(0)
+  favoriteCount Int    @default(0)
+  rating        Float? // Average rating
+  reviewCount   Int    @default(0)
+
+  // Relations
+  userId          String
+  categoryId      String
+  user            User             @relation(fields: [userId], references: [id])
+  category        Category         @relation(fields: [categoryId], references: [id])
+  mealPlans       MealPlanRecipe[]
+  favoritedBy     FavoriteRecipe[]
+  recommendations Recommendation[]
+
+  // Timestamps
+  createdAt DateTime @default(now()) @map(name: "created_at")
+  updatedAt DateTime @updatedAt @map(name: "updated_at")
+
+  @@index([status, userId])
+  @@index([categoryId])
+  @@index([tags])
+  @@map(name: "recipes")
+}
+
+model Category {
+  id          String   @id @default(cuid())
+  slug        String   @unique // URL-friendly identifier
+  name        String   @unique
+  description String?  @db.Text
+  imageUrl    String?
+  recipes     Recipe[]
+  createdAt   DateTime @default(now()) @map(name: "created_at")
+  updatedAt   DateTime @updatedAt @map(name: "updated_at")
+
+  @@map(name: "categories")
+}
+
+model FavoriteRecipe {
+  id        String   @id @default(cuid())
+  userId    String
+  recipeId  String
+  notes     String?  @db.Text
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  recipe    Recipe   @relation(fields: [recipeId], references: [id], onDelete: Cascade)
+  createdAt DateTime @default(now()) @map(name: "created_at")
+
+  @@unique([userId, recipeId])
+  @@index([userId])
+  @@map(name: "favorite_recipes")
+}
+
+model MealPlan {
+  id            String   @id @default(cuid())
+  name          String
+  userId        String
+  startDate     DateTime
+  endDate       DateTime
+  totalCalories Int?
+  notes         String?  @db.Text
+  isTemplate    Boolean  @default(false) // For saving meal plan templates
+
+  // Relations
+  user         User             @relation(fields: [userId], references: [id])
+  recipes      MealPlanRecipe[]
+  shoppingList ShoppingList?
+
+  // Timestamps
+  createdAt DateTime @default(now()) @map(name: "created_at")
+  updatedAt DateTime @updatedAt @map(name: "updated_at")
+
+  @@index([userId, startDate])
+  @@map(name: "meal_plans")
+}
+
+model MealPlanRecipe {
+  id         String       @id @default(cuid())
+  mealPlanId String
+  recipeId   String
+  date       DateTime
+  mealType   MealTypeEnum
+  servings   Int          @default(1)
+  notes      String?      @db.Text
+
+  // Relations
+  mealPlan MealPlan @relation(fields: [mealPlanId], references: [id], onDelete: Cascade)
+  recipe   Recipe   @relation(fields: [recipeId], references: [id])
+
+  @@index([mealPlanId, date])
+  @@map(name: "meal_plan_recipes")
+}
+
+model ShoppingList {
+  id          String  @id @default(cuid())
+  userId      String
+  mealPlanId  String  @unique
+  items       Json // Structured JSON for shopping items
+  isCompleted Boolean @default(false)
+  notes       String? @db.Text
+
+  // Relations
+  user     User     @relation(fields: [userId], references: [id])
+  mealPlan MealPlan @relation(fields: [mealPlanId], references: [id])
+
+  // Timestamps
+  createdAt DateTime @default(now()) @map(name: "created_at")
+  updatedAt DateTime @updatedAt @map(name: "updated_at")
+
+  @@index([userId, isCompleted])
+  @@map(name: "shopping_lists")
+}
+
+model NutritionJournal {
+  id            String   @id @default(cuid())
+  userId        String
+  date          DateTime
+  entries       Json // Structured JSON for nutrition entries
+  totalCalories Int
+  totalProtein  Float?
+  totalCarbs    Float?
+  totalFat      Float?
+  notes         String?  @db.Text
+  mood          String? // Track mood with meals
+  hydration     Int? // Water intake in ml
+
+  // Relations
+  user User @relation(fields: [userId], references: [id])
+
+  // Timestamps
+  createdAt DateTime @default(now()) @map(name: "created_at")
+  updatedAt DateTime @updatedAt @map(name: "updated_at")
+
+  @@unique([userId, date])
+  @@index([userId, date])
+  @@map(name: "nutrition_journals")
+}
+
+model Recommendation {
+  id             String             @id @default(cuid())
+  recipeId       String
+  recommendedFor String // User ID or category
+  score          Float // Recommendation score
+  reason         String?            @db.Text
+  type           RecommendationType
+  expiresAt      DateTime? // For time-sensitive recommendations
+
+  // Relations
+  recipe Recipe @relation(fields: [recipeId], references: [id])
+
+  // Timestamps
+  createdAt DateTime @default(now()) @map(name: "created_at")
+  updatedAt DateTime @updatedAt @map(name: "updated_at")
+
+  @@index([recommendedFor, score])
+  @@map(name: "recommendations")
+}
+
+model CommunityPost {
+  id          String       @id @default(cuid())
+  userId      String
+  title       String       @db.VarChar(255)
+  content     String       @db.Text
+  imageUrl    String?
+  likes       Int          @default(0)
+  type        PostTypeEnum @default(GENERAL)
+  tags        String[]
+  isPublished Boolean      @default(true)
+
+  // Relations
+  user User @relation(fields: [userId], references: [id])
+
+  // Timestamps
+  createdAt DateTime @default(now()) @map(name: "created_at")
+  updatedAt DateTime @updatedAt @map(name: "updated_at")
+
+  @@index([userId, createdAt])
+  @@index([type, isPublished])
+  @@map(name: "community_posts")
+}
+
+model Feedback {
+  id         String               @id @default(cuid())
+  userId     String
+  type       FeedbackTypeEnum
+  category   String
+  subject    String               @db.VarChar(255)
+  message    String               @db.Text
+  status     FeedbackStatusEnum   @default(PENDING)
+  priority   FeedbackPriorityEnum @default(MEDIUM)
+  assignedTo String? // Admin/Support user ID
+
+  // Relations
+  user User @relation(fields: [userId], references: [id])
+
+  // Timestamps
+  createdAt  DateTime  @default(now()) @map(name: "created_at")
+  updatedAt  DateTime  @updatedAt @map(name: "updated_at")
+  resolvedAt DateTime?
+
+  @@index([status, priority])
+  @@map(name: "feedback")
+}
+
 enum UserRolesEnum {
   ADMIN
   USER
-  SUPORT
+  SUPPORT
+}
+
+enum RecipeDifficultyEnum {
+  EASY
+  MEDIUM
+  HARD
+  EXPERT
+}
+
+enum RecipeStatusEnum {
+  DRAFT
+  PUBLISHED
+  ARCHIVED
+}
+
+enum MealTypeEnum {
+  BREAKFAST
+  LUNCH
+  DINNER
+  SNACK
+}
+
+enum FeedbackTypeEnum {
+  SUGGESTION
+  ISSUE
+  QUESTION
+  BUG
+  OTHER
+}
+
+enum FeedbackStatusEnum {
+  PENDING
+  IN_PROGRESS
+  RESOLVED
+  CLOSED
+  REJECTED
+}
+
+enum FeedbackPriorityEnum {
+  LOW
+  MEDIUM
+  HIGH
+  URGENT
+}
+
+enum PostTypeEnum {
+  GENERAL
+  RECIPE_SHARE
+  QUESTION
+  TIP
+  SUCCESS_STORY
+}
+
+enum RecommendationType {
+  PERSONALIZED
+  TRENDING
+  SEASONAL
+  SIMILAR
+  DIETARY
 }

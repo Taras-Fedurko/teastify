@@ -1,0 +1,474 @@
+# Project Overview: Teastify
+
+## Tech Stack
+
+### Core Technologies
+- Next.js 15.1.0 (React Framework)
+- React 19.0.0
+- TypeScript
+- PostgreSQL (Database)
+- Prisma 6.1.0 (ORM)
+  - Database client import: `import prisma from '@/lib/prisma';`
+- TailwindCSS 3.4.1 (Styling)
+
+### API Structure
+- Centralized API client in `lib/api/fetch.ts`
+  - Type-safe fetch wrapper
+  - Consistent error handling
+  - Automatic JSON parsing
+  - HTTP method helpers (get, post, put, patch, delete)
+  - Usage example:
+    ```typescript
+    import { api } from '@/lib/api/fetch';
+    
+    // POST request
+    const recipe = await api.post('/recipes', recipeData);
+    
+    // GET request
+    const recipes = await api.get('/recipes');
+    
+    // PUT request
+    const updated = await api.put(`/recipes/${id}`, updateData);
+    
+    // DELETE request
+    await api.delete(`/recipes/${id}`);
+    ```
+
+### Authentication & Security
+- NextAuth.js 5.0.0-beta.25
+- bcryptjs for password hashing
+- Google ReCAPTCHA v3 integration
+- Email verification system with nodemailer
+
+### UI Components & Design
+- Tailwind CSS 3.4.1
+  - Utility-first CSS framework
+  - Custom configuration in `tailwind.config.ts`
+  - Dark mode support via `next-themes`
+  - Custom animations via `tailwindcss-animate`
+  - Custom class merging with `tailwind-merge`
+  - Class variance handling with `class-variance-authority`
+
+- shadcn/ui Components
+  - Built on Radix UI primitives
+  - Fully customizable components
+  - Styled with Tailwind CSS
+  - All components located in `/components` directory (not in `app/components`)
+  - Key components used:
+    - Alert Dialog
+    - Avatar
+    - Checkbox
+    - Collapsible
+    - Dialog
+    - Dropdown Menu
+    - Label
+    - Popover
+    - Progress
+    - Scroll Area
+    - Select
+    - Separator
+    - Switch
+    - Tabs
+    - Toast
+    - Tooltip
+
+- Additional UI Libraries
+  - Lucide React (Icons)
+  - Sonner (Toast notifications)
+  - React Day Picker (Date selection)
+  - Quill (Rich text editor)
+  - React Hook Form with Zod validation
+  - Vaul (Drawer components)
+
+### Styling Architecture
+- Component-based styling using Tailwind classes
+- Consistent theme tokens in `components.json`
+- Global styles in `app/globals.css`
+- Utility patterns:
+  - `cn()` utility for class name merging
+  - Variant patterns using `cva()`
+  - Dark mode utilities
+  - Animation classes
+  - Responsive design utilities
+
+## Project Structure
+
+### Database Schema
+The application uses a PostgreSQL database with the following models:
+
+1. User
+   - id: String (cuid, primary key)
+   - name: String (optional)
+   - email: String (unique)
+   - emailVerified: DateTime (optional)
+   - password: String
+   - role: UserRolesEnum (default: USER)
+   - timeFormat: String (optional)
+   - timeZone: String (optional)
+   - createdAt: DateTime
+   - updatedAt: DateTime
+   - Relations: accounts, sessions, profile, recipes, mealPlans, shoppingLists, nutritionJournals, communityPosts, feedback, favorites
+
+2. Account (OAuth)
+   - userId: String
+   - type: String
+   - provider: String
+   - providerAccountId: String
+   - refresh_token: String (optional)
+   - access_token: String (optional)
+   - expires_at: Int (optional)
+   - token_type: String (optional)
+   - scope: String (optional)
+   - id_token: String (optional)
+   - session_state: String (optional)
+   - createdAt: DateTime
+   - updatedAt: DateTime
+
+3. Session
+   - sessionToken: String (unique)
+   - userId: String
+   - expires: DateTime
+   - createdAt: DateTime
+   - updatedAt: DateTime
+
+4. VerificationToken
+   - identifier: String
+   - token: String
+   - expires: DateTime
+
+5. ResetPasswordToken
+   - id: String (cuid, primary key)
+   - email: String
+   - token: String (unique)
+   - expires: DateTime
+
+6. UserProfile
+   - id: String (cuid, primary key)
+   - userId: String (unique)
+   - bio: Text (optional)
+   - avatarUrl: String (optional)
+   - preferences: Json (optional)
+   - dietaryRestrictions: Json (optional)
+   - notificationSettings: Json (optional)
+   - createdAt: DateTime
+   - updatedAt: DateTime
+
+7. Recipe
+   - id: String (cuid, primary key)
+   - slug: String (unique)
+   - title: String
+   - description: Text (optional)
+   - instructions: Text
+   - ingredients: Json
+   - imageUrl: String (optional)
+   - preparationTime: Int (minutes)
+   - cookingTime: Int (minutes)
+   - servings: Int
+   - calories: Int (optional)
+   - difficulty: RecipeDifficultyEnum (default: MEDIUM)
+   - status: RecipeStatusEnum (default: DRAFT)
+   - nutritionInfo: Json (optional)
+   - tags: String[]
+   - cuisine: String (optional)
+   - isVegetarian: Boolean
+   - isVegan: Boolean
+   - isGlutenFree: Boolean
+   - viewCount: Int
+   - favoriteCount: Int
+   - rating: Float (optional)
+   - reviewCount: Int
+   - userId: String
+   - categoryId: String
+   - createdAt: DateTime
+   - updatedAt: DateTime
+   - Relations: user, category, mealPlans, favoritedBy, recommendations
+
+8. Category
+   - id: String (cuid, primary key)
+   - slug: String (unique)
+   - name: String (unique)
+   - description: Text (optional)
+   - imageUrl: String (optional)
+   - createdAt: DateTime
+   - updatedAt: DateTime
+   - Relations: recipes
+
+9. FavoriteRecipe
+   - id: String (cuid, primary key)
+   - userId: String
+   - recipeId: String
+   - notes: Text (optional)
+   - createdAt: DateTime
+   - Relations: user, recipe
+
+10. MealPlan
+    - id: String (cuid, primary key)
+    - name: String
+    - userId: String
+    - startDate: DateTime
+    - endDate: DateTime
+    - totalCalories: Int (optional)
+    - notes: Text (optional)
+    - isTemplate: Boolean
+    - createdAt: DateTime
+    - updatedAt: DateTime
+    - Relations: user, recipes, shoppingList
+
+11. MealPlanRecipe
+    - id: String (cuid, primary key)
+    - mealPlanId: String
+    - recipeId: String
+    - date: DateTime
+    - mealType: MealTypeEnum
+    - servings: Int
+    - notes: Text (optional)
+    - Relations: mealPlan, recipe
+
+12. ShoppingList
+    - id: String (cuid, primary key)
+    - userId: String
+    - mealPlanId: String (unique)
+    - items: Json
+    - isCompleted: Boolean
+    - notes: Text (optional)
+    - createdAt: DateTime
+    - updatedAt: DateTime
+    - Relations: user, mealPlan
+
+13. NutritionJournal
+    - id: String (cuid, primary key)
+    - userId: String
+    - date: DateTime
+    - entries: Json
+    - totalCalories: Int
+    - totalProtein: Float (optional)
+    - totalCarbs: Float (optional)
+    - totalFat: Float (optional)
+    - notes: Text (optional)
+    - createdAt: DateTime
+    - updatedAt: DateTime
+    - Relations: user
+
+14. Recommendation
+    - id: String (cuid, primary key)
+    - userId: String
+    - recipeId: String
+    - type: RecommendationType
+    - reason: Text (optional)
+    - score: Float
+    - isViewed: Boolean
+    - createdAt: DateTime
+    - updatedAt: DateTime
+    - Relations: user, recipe
+
+15. CommunityPost
+    - id: String (cuid, primary key)
+    - userId: String
+    - title: String
+    - content: Text
+    - type: PostTypeEnum
+    - imageUrl: String (optional)
+    - likes: Int
+    - status: String
+    - tags: String[]
+    - createdAt: DateTime
+    - updatedAt: DateTime
+    - Relations: user
+
+16. Feedback
+    - id: String (cuid, primary key)
+    - userId: String
+    - type: FeedbackTypeEnum
+    - title: String
+    - description: Text
+    - status: FeedbackStatusEnum
+    - priority: FeedbackPriorityEnum
+    - createdAt: DateTime
+    - updatedAt: DateTime
+    - Relations: user
+
+Enums:
+1. UserRolesEnum: ADMIN, USER, SUPPORT
+2. RecipeDifficultyEnum: EASY, MEDIUM, HARD, EXPERT
+3. RecipeStatusEnum: DRAFT, PUBLISHED, ARCHIVED, UNDER_REVIEW
+4. MealTypeEnum: BREAKFAST, LUNCH, DINNER, SNACK, BRUNCH, DESSERT
+5. FeedbackTypeEnum: BUG, FEATURE, IMPROVEMENT, QUESTION, OTHER
+6. FeedbackStatusEnum: OPEN, IN_PROGRESS, RESOLVED, CLOSED, PENDING
+7. FeedbackPriorityEnum: LOW, MEDIUM, HIGH, CRITICAL, URGENT
+8. PostTypeEnum: RECIPE_SHARE, QUESTION, TIP, ACHIEVEMENT, GENERAL
+9. RecommendationType: SIMILAR, SEASONAL, TRENDING, PERSONALIZED, DIETARY
+
+### Application Architecture
+- `/app` - Next.js app router structure
+  - `/api` - API routes
+  - `/landing` - Landing page components
+  - `/(auth)` - Authentication related pages
+  
+- `/components` - Reusable UI components
+  - `/ui` - Base UI components (shadcn/ui)
+  - `/recipes` - Recipe-related components
+  - `/auth` - Authentication components
+  - `/layout` - Layout components
+  - `/forms` - Form components
+  - `/shared` - Shared/common components
+- `/hooks` - Custom React hooks
+- `/lib` - Utility functions and shared logic
+- `/modules` - Feature-specific modules
+- `/prisma` - Database schema and migrations
+- `/public` - Static assets
+- `/types` - TypeScript type definitions
+
+### Routing Structure
+
+#### Public Routes
+- `/` - Landing page with features overview
+- `/recipes` - Browse all recipes
+- `/recipe/:id` - View recipe details
+- `/categories` - Browse recipe categories
+- `/category/:name` - View category-specific recipes
+- `/community` - Community hub
+- `/feedback` - Submit feedback
+
+#### Protected Routes
+
+1. Profile Management (`/profile`)
+   - Dashboard with user overview
+   - Profile customization
+   - Notification preferences
+   - Security settings
+   - Activity tracking
+
+2. Personal Recipe Management (`/my`)
+   - `/my/recipes` - Personal recipe collection
+     - Create and edit recipes
+     - Manage recipe status (published/draft/archived)
+     - Search and filter personal recipes
+   - `/my/favorites` - Saved favorite recipes
+     - Save recipes for quick access
+     - Organize and sort favorites
+     - Quick actions for saved recipes
+   - `/my/meal-plans` - Personal meal planning
+     - Weekly/monthly meal calendar
+     - Meal scheduling
+     - Shopping list generation
+   - `/my/nutrition-history` - Personal nutrition tracking
+     - Nutrition analytics
+     - Progress tracking
+     - Goal setting
+
+3. Meal Planning Features
+   - `/meal-planner` - Meal planning dashboard
+   - `/meal-planner/generate` - AI-powered meal plan generation
+   - `/shopping-list` - Shopping list management
+   - `/shopping-list/export` - Export shopping lists
+
+4. Nutrition Features
+   - `/nutrition-journal` - Daily nutrition tracking
+   - `/nutrition-journal/analytics` - Nutrition analysis
+   - `/recommendations` - Personalized recommendations
+   - `/recommendations/tips` - Nutrition tips and advice
+
+#### Authentication Routes
+- `/sign-in` - Login page
+- `/sign-up` - Registration page
+- `/sign-out` - Logout endpoint
+- `/forgot-password` - Password recovery
+- `/new-password` - Password reset
+- `/email-verify` - Email verification
+- `/verify-request` - Verification request
+- `/auth-error` - Authentication error handling
+
+#### API Routes
+
+1. Authentication (`/api/auth`)
+   - NextAuth.js endpoints
+   - OAuth providers
+   - Session management
+
+2. Recipe Management (`/api/recipes`)
+   - CRUD operations
+   - Search and filtering
+   - Categories management
+   - Ratings and reviews
+
+3. Meal Planning (`/api/meal-planner`)
+   - Plan creation and management
+   - Shopping list generation
+   - Recipe scheduling
+
+4. Nutrition Tracking (`/api/nutrition`)
+   - Nutrition data logging
+   - Analytics and reporting
+   - Recommendations engine
+
+5. Community (`/api/community`)
+   - Social interactions
+   - Content sharing
+   - User engagement
+
+6. Profile (`/api/profile`)
+   - User data management
+   - Preferences
+   - Activity tracking
+
+#### Route Protection Levels
+- Public Access: Landing, recipes browsing, categories, community, feedback
+- Protected Access: Profile, personal recipes, meal planning, nutrition tracking
+- Auth Only: Sign in, sign up, password reset flows
+- API Protection: JWT/Session based authentication
+
+#### Route Features
+- Dynamic route parameters
+- Nested layouts
+- Loading states
+- Error boundaries
+- SEO optimization
+- Type-safe routing
+- Middleware protection
+- Response caching
+
+## Development Tools
+- ESLint for code linting
+- Prettier for code formatting
+- TypeScript for type checking
+- Prisma Studio for database management
+- TurboRepo for build optimization
+
+## Features
+1. Authentication System
+   - Email/Password authentication
+   - OAuth integration capability
+   - Password reset functionality
+   - Email verification
+
+2. User Management
+   - Role-based access control
+   - User preferences (timezone, time format)
+   - Session management
+
+3. Modern UI/UX
+   - Responsive design
+   - Dark/Light theme support
+   - Toast notifications
+   - Rich text editing capabilities
+   - Date picking functionality
+   - Accessible components (via Radix UI)
+
+## Development Scripts
+- `dev`: Development server with Turbopack
+- `build`: Production build with Prisma generation
+- `start`: Production server
+- `lint`: Code linting
+- `prisma:generate`: Generate Prisma client
+- `prisma:studio`: Database management UI
+- `prisma:migration`: Database migrations
+- `ts:check`: TypeScript type checking
+
+## Environment Requirements
+- Node.js
+- PostgreSQL database
+- Environment variables for:
+  - Database connection
+  - Authentication settings
+  - Email service
+  - ReCAPTCHA keys 

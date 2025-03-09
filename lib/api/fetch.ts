@@ -1,62 +1,46 @@
-type HttpMethod = 'GET' | 'POST' | 'PUT' | 'DELETE' | 'PATCH';
+type FetchOptions = Omit<RequestInit, 'body'> & {
+  body?: Record<string, unknown>;
+};
 
-interface FetchOptions<TBody extends BodyInit | null | undefined = undefined> extends RequestInit {
-  method?: HttpMethod;
-  body?: TBody;
-  params?: Record<string, string | number | boolean>;
-}
+type ApiResponse<T> = {
+  data: T;
+  error?: string;
+};
 
-interface FetchResponse<T> {
-  data: T | null;
-  error: string | null;
-}
+async function fetchApi<T>(endpoint: string, options: FetchOptions = {}): Promise<ApiResponse<T>> {
+  const { body, headers, ...rest } = options;
 
-const BASE_URL = process.env.NEXT_PUBLIC_API_URL ?? "http://localhost:3000";
+  const response = await fetch(endpoint, {
+    headers: {
+      'Content-Type': 'application/json',
+      ...headers,
+    },
+    body: body ? JSON.stringify(body) : undefined,
+    ...rest,
+  });
 
-async function baseFetch<TResponse, TBody extends BodyInit | null | undefined = undefined>(
-  url: string,
-  options?: FetchOptions<TBody>
-): Promise<FetchResponse<TResponse>> {
-  const {
-    method = 'GET',
-    headers = {},
-    body,
-    params,
-    ...restOptions // Destructure and collect remaining options
-  } = options || {};
+  const data = await response.json();
 
-  // Build the query string if params are provided
-  const queryString = params
-    ? '?' + new URLSearchParams(params as Record<string, string>).toString()
-    : '';
-
-  // Construct the full URL with query string
-  const fullUrl = `${BASE_URL}${url}${queryString}`;  
-
-  try {
-    const response = await fetch(fullUrl, {
-      method,
-      headers: {
-        'Content-Type': 'application/json',
-        ...headers,
-      },
-      body, // Use body directly since it's already type-safe
-      ...restOptions, // Spread other RequestInit options like mode, credentials, etc.
-    });
-
-    if (!response.ok) {
-      throw new Error(`HTTP error! status: ${response.status}`);
-    }    
-
-    const data: TResponse = await response.json();
-    return { data, error: null };
-  } catch (error: unknown) {
-    if (process.env.NODE_ENV !== 'production') {
-      console.error(error);
-    }
-
-    throw error;
+  if (!response.ok) {
+    throw new Error(data.error || 'An error occurred');
   }
+
+  return { data };
 }
 
-export default baseFetch;
+export default {
+  get: <T>(endpoint: string, options?: Omit<FetchOptions, 'method' | 'body'>) =>
+    fetchApi<T>(endpoint, { ...options, method: 'GET' }),
+
+  post: <T>(endpoint: string, body: Record<string, unknown>, options?: Omit<FetchOptions, 'method'>) =>
+    fetchApi<T>(endpoint, { ...options, method: 'POST', body }),
+
+  put: <T>(endpoint: string, body: Record<string, unknown>, options?: Omit<FetchOptions, 'method'>) =>
+    fetchApi<T>(endpoint, { ...options, method: 'PUT', body }),
+
+  patch: <T>(endpoint: string, body: Record<string, unknown>, options?: Omit<FetchOptions, 'method'>) =>
+    fetchApi<T>(endpoint, { ...options, method: 'PATCH', body }),
+
+  delete: <T>(endpoint: string, options?: Omit<FetchOptions, 'method' | 'body'>) =>
+    fetchApi<T>(endpoint, { ...options, method: 'DELETE' }),
+};
