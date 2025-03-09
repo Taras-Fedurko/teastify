@@ -1,17 +1,11 @@
 import { Metadata } from "next"
 
-type Props = {
-  params: {
-    id: string
-  }
-}
-
 export const metadata: Metadata = {
   title: 'Recipe Details | Teastify',
   description: 'Detailed recipe information with ingredients and instructions',
 }
 
-export default function RecipeDetailPage({ params }: Props) {
+export default function RecipeDetailPage() {
   return (
     <div className="container mx-auto py-8">
       <div className="max-w-4xl mx-auto">

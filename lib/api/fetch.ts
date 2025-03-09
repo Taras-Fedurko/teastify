@@ -28,7 +28,7 @@ async function fetchApi<T>(endpoint: string, options: FetchOptions = {}): Promis
   return { data };
 }
 
-export default {
+const api = {
   get: <T>(endpoint: string, options?: Omit<FetchOptions, 'method' | 'body'>) =>
     fetchApi<T>(endpoint, { ...options, method: 'GET' }),
 
@@ -43,4 +43,6 @@ export default {
 
   delete: <T>(endpoint: string, options?: Omit<FetchOptions, 'method' | 'body'>) =>
     fetchApi<T>(endpoint, { ...options, method: 'DELETE' }),
-};
+} as const;
+
+export default api;

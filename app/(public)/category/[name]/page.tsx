@@ -1,9 +1,9 @@
 import { Metadata } from "next"
 
 type Props = {
-  params: {
+  params: Promise<{
     name: string
-  }
+  }>
 }
 
 export const metadata: Metadata = {
@@ -11,11 +11,13 @@ export const metadata: Metadata = {
   description: 'Browse recipes in this category',
 }
 
-export default function CategoryPage({ params }: Props) {
+export default async function CategoryPage({ params }: Props) {
+  const { name } = await params;
+
   return (
     <div className="container mx-auto py-8">
       <div className="mb-8">
-        <h1 className="text-4xl font-bold mb-4">Category: {params.name}</h1>
+        <h1 className="text-4xl font-bold mb-4">Category: {name}</h1>
         <p className="text-muted-foreground">Browse all recipes in this category</p>
       </div>
 
