@@ -43,10 +43,11 @@ const Header = () => {
 
   // Admin routes only available to admin users
   const adminRoutes = [
-    { name: 'Meal Planner', path: routes.mealPlanner.root },
-    { name: 'Shopping List', path: routes.mealPlanner.shoppingList },
-    { name: 'Nutrition Analytics', path: routes.nutrition.analytics },
-    { name: 'Recommendations', path: routes.nutrition.recommendations },
+    { name: 'Dashboard', path: routes.admin.root },
+    { name: 'Users', path: routes.admin.users },
+    { name: 'Recipes', path: routes.admin.recipes },
+    { name: 'Categories', path: routes.admin.categories },
+    { name: 'Meal Plans', path: routes.admin.mealPlans },
   ];
 
   return (

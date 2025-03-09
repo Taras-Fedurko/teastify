@@ -16,6 +16,14 @@ export const routes = {
     authError: "/auth-error", 
   },
 
+  admin: {
+    root: '/admin',
+    users: '/admin/users',
+    recipes: '/admin/recipes',
+    categories: '/admin/categories',
+    mealPlans: '/admin/meal-plans',
+  },
+
   recipes: {
     list: '/recipes',
     detail: '/recipe/:id',
