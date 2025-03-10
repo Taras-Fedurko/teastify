@@ -13,10 +13,20 @@ import {
 // Get all admin routes from the routes configuration
 const adminRoutes = Object.values(routes.admin);
 
-// Define public API routes
-const publicApiRoutes = [
-  '/api/categories',
-  '/api/recipes',
+// Define protected API routes that require authentication
+const protectedApiRoutes = [
+  // User-specific routes
+  '/api/user',
+  '/api/profile',
+  '/api/my',
+  
+  // Protected features
+  '/api/meal-plans',
+  '/api/favorites',
+  '/api/nutrition',
+  
+  // Admin routes
+  '/api/admin',
 ];
 
 const { auth } = NextAuth(authConfig);
@@ -27,15 +37,21 @@ export default auth((req) => {
   
   const isApiAuth = nextUrl.pathname.startsWith(apiAuthPrefix);
   const isPublicRoute = publicRoutes.includes(nextUrl.pathname);
-  const isPublicApiRoute = publicApiRoutes.some(route => nextUrl.pathname.startsWith(route));
+  const isApiRoute = nextUrl.pathname.startsWith('/api');
+  const isProtectedApiRoute = protectedApiRoutes.some(route => nextUrl.pathname.startsWith(route));
   const isAuthRoute = authRoutes.includes(nextUrl.pathname);
   const isAdminRoute = adminRoutes.includes(nextUrl.pathname);
   
+  // Allow all auth API routes
   if (isApiAuth) {
     return;
   }
 
-  if (isPublicApiRoute) {
+  // Allow public API routes but protect specific ones
+  if (isApiRoute) {
+    if (isProtectedApiRoute && !isLoggedIn) {
+      return Response.json({ error: 'Unauthorized' }, { status: 401 });
+    }
     return;
   }
   
