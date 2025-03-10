@@ -1,5 +1,5 @@
 'use client';
-
+import Image from 'next/image';
 import { useParams, useRouter } from 'next/navigation';
 import { useRecipeBySlug } from '@/lib/api/hooks/receipes';
 import { Recipe, Category } from '@prisma/client';
@@ -59,10 +59,11 @@ export default function RecipePage() {
       <div className="relative h-[50vh] min-h-[400px] w-full">
         <div className="absolute inset-0">
           {recipe.imageUrl ? (
-            // eslint-disable-next-line @next/next/no-img-element
-            <img
+            <Image
               src={recipe.imageUrl}
               alt={recipe.title}
+              width={1920}
+              height={1080}
               className="w-full h-full object-cover"
             />
           ) : (

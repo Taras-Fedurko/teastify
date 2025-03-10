@@ -5,8 +5,10 @@ import { Search } from 'lucide-react';
 import { usePathname, useRouter, useSearchParams } from 'next/navigation';
 import { useCallback, useState, useEffect } from 'react';
 import { useDebounce } from '@/hooks/useDebounce';
+import { Skeleton } from '@/components/ui/skeleton';
+import { Suspense } from 'react';
 
-export function CategorySearch() {
+function CategorySearchContent() {
   const router = useRouter();
   const pathname = usePathname();
   const searchParams = useSearchParams();
@@ -35,6 +37,22 @@ export function CategorySearch() {
         onChange={(e) => setSearchTerm(e.target.value)}
         value={searchTerm}
       />
+    </div>
+  );
+}
+
+export function CategorySearch() {
+  return (
+    <Suspense fallback={<CategorySearchSkeleton />}>
+      <CategorySearchContent />
+    </Suspense>
+  );
+}
+
+function CategorySearchSkeleton() {
+  return (
+    <div className="relative max-w-md mx-auto">
+      <Skeleton className="h-10 w-full" />
     </div>
   );
 } 

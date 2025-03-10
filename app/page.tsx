@@ -48,24 +48,19 @@ async function getFeaturedContent() {
 }
 
 export default async function HomePage() {
-  const { categories, trendingRecipes } = await getFeaturedContent();
   const session = await auth();
+  const { categories, trendingRecipes } = await getFeaturedContent();
 
   return (
     <div className="flex flex-col min-h-screen">
       {/* Hero Section */}
-      <section className="relative h-[600px] flex items-center justify-center">
-        <div className="absolute inset-0 bg-gradient-to-r from-black/60 to-black/30 z-10" />
-        <div className="absolute inset-0">
-          <Image
-            src="/images/hero-bg.jpg"
-            alt="Delicious food background"
-            fill
-            className="object-cover"
-            priority
-          />
-        </div>
-        <div className="relative z-20 container mx-auto px-4 text-center text-white">
+      <section 
+        className="relative h-[600px] flex items-center justify-center bg-cover bg-center"
+        style={{
+          backgroundImage: 'linear-gradient(rgba(0, 0, 0, 0.5), rgba(0, 0, 0, 0.5)), url("https://images.unsplash.com/photo-1495521821757-a1efb6729352?q=80&w=2062")'
+        }}
+      >
+        <div className="container mx-auto px-4 text-center text-white relative z-10">
           <h1 className="text-5xl md:text-6xl font-bold mb-6">
             Discover & Share Amazing Recipes
           </h1>

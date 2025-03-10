@@ -1,6 +1,7 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, Suspense } from 'react';
+import Image from 'next/image';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { useRecipes } from '@/lib/api/hooks/receipes';
 import { useCategories } from '@/lib/api/hooks/categories';
@@ -33,7 +34,7 @@ type RecipeWithCategory = Recipe & {
   category: Category | null;
 };
 
-export default function RecipesPage() {
+function RecipesContent() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const [page, setPage] = useState(1);
@@ -273,6 +274,45 @@ export default function RecipesPage() {
   );
 }
 
+export default function RecipesPage() {
+  return (
+    <Suspense fallback={<RecipesPageSkeleton />}>
+      <RecipesContent />
+    </Suspense>
+  );
+}
+
+function RecipesPageSkeleton() {
+  return (
+    <div className="container mx-auto px-4 py-8">
+      <div className="relative h-[300px] w-full mb-8 rounded-lg overflow-hidden">
+        <Skeleton className="w-full h-full" />
+      </div>
+      <div className="flex flex-col md:flex-row gap-6 mb-8">
+        <div className="w-full md:w-64">
+          <Skeleton className="h-[600px] w-full" />
+        </div>
+        <div className="flex-1">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            {Array(12).fill(0).map((_, i) => (
+              <Card key={i} className="overflow-hidden">
+                <Skeleton className="h-48 w-full" />
+                <CardHeader>
+                  <Skeleton className="h-6 w-3/4" />
+                </CardHeader>
+                <CardContent>
+                  <Skeleton className="h-4 w-full mb-2" />
+                  <Skeleton className="h-4 w-2/3" />
+                </CardContent>
+              </Card>
+            ))}
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+}
+
 function RecipeCard({ recipe, onClick }: { recipe: RecipeWithCategory; onClick: () => void }) {
   return (
     <Card 
@@ -281,10 +321,11 @@ function RecipeCard({ recipe, onClick }: { recipe: RecipeWithCategory; onClick: 
     >
       <div className="relative h-48 bg-muted">
         {recipe.imageUrl && (
-          // eslint-disable-next-line @next/next/no-img-element
-          <img
+          <Image
             src={recipe.imageUrl}
             alt={recipe.title}
+            width={800}
+            height={400}
             className="w-full h-full object-cover"
           />
         )}
