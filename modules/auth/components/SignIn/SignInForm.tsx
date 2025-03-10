@@ -30,7 +30,7 @@ export default function SignInForm() {
       password: '',
     },
     captcha: {
-      enableCaptcha: process.env.NODE_ENV === 'production',
+      enableCaptcha: process.env.DISABLE_CAPTCHA === 'false',
       executeRecaptcha,
       action: 'credentials_signin',
       tokenExpiryMs: 120000,
