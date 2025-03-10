@@ -131,7 +131,7 @@ const Header = () => {
             )}
 
             {/* Auth Buttons */}
-            {session?.user ? (
+            {session?.user?.email ? (
               <Button
                 variant="default"
                 onClick={() => signOut()}

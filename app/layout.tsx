@@ -5,7 +5,6 @@ import "./globals.css";
 import Provider from "@/components/providers";
 import ToastProvider from "@/components/ui/toaster";
 import { ThemeSwitch } from "@/components/ThemeSwitch";
-import Header from "@/components/Header/Header";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -36,7 +35,6 @@ export default function RootLayout({
           <div className="absolute top-[16px] right-[16px]">
             <ThemeSwitch />
           </div>
-          <Header />
           {children}
           <ToastProvider />
         </Provider>
