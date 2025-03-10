@@ -8,74 +8,108 @@ body {
 
 @layer base {
   :root {
-    --background: 0 0% 100%;
-    --foreground: 224 71.4% 4.1%;
+    /* ========== Світла тема ========== */
+    --background: 0 0% 100%;           /* Білий фон */
+    --foreground: 20 20% 10%;          /* Темно-коричневий (теплий) текст */
     --card: 0 0% 100%;
-    --card-foreground: 224 71.4% 4.1%;
+    --card-foreground: 20 20% 10%;
     --popover: 0 0% 100%;
-    --popover-foreground: 224 71.4% 4.1%;
-    --primary: 262.1 83.3% 57.8%;
-    --primary-foreground: 210 20% 98%;
-    --secondary: 220 14.3% 95.9%;
-    --secondary-foreground: 220.9 39.3% 11%;
-    --muted: 220 14.3% 95.9%;
-    --muted-foreground: 220 8.9% 46.1%;
-    --accent: 220 14.3% 95.9%;
-    --accent-foreground: 220.9 39.3% 11%;
-    --destructive: 0 84.2% 60.2%;
-    --destructive-foreground: 210 20% 98%;
-    --border: 220 13% 91%;
-    --input: 220 13% 91%;
-    --ring: 262.1 83.3% 57.8%;
+    --popover-foreground: 20 20% 10%;
+
+    /* Менш яскравий зелений */
+    --primary: 120 45% 35%;
+    --primary-foreground: 0 0% 100%;
+
+    /* Вторинний колір — помаранчевий (не змінювався) */
+    --secondary: 36 80% 60%;
+    --secondary-foreground: 0 0% 100%;
+
+    /* Приглушені відтінки для фонових елементів */
+    --muted: 36 20% 95%;
+    --muted-foreground: 20 10% 30%;
+
+    /* Нейтральний акцент замість яскравого червоного */
+    --accent: 30 25% 45%;                 /* Теплий коричнево-бежевий відтінок */
+    --accent-foreground: 0 0% 100%;       /* Білий текст на тлі акценту */
+
+    /* «Небезпечний» колір, якщо потрібно (залишив попередній приклад) */
+    --destructive: 0 70% 50%;
+    --destructive-foreground: 0 0% 100%;
+
+    /* Межі, інпути, фокусне кільце */
+    --border: 36 20% 90%;
+    --input: 36 20% 90%;
+    --ring: 120 45% 35%;
     --radius: 0.75rem;
-    --chart-1: 12 76% 61%;
-    --chart-2: 173 58% 39%;
-    --chart-3: 197 37% 24%;
-    --chart-4: 43 74% 66%;
-    --chart-5: 27 87% 67%;
+
+    /* Кольори для графіків (за бажанням можна змінити) */
+    --chart-1: 14 80% 55%;
+    --chart-2: 120 45% 35%;
+    --chart-3: 54 90% 60%;
+    --chart-4: 36 90% 60%;
+    --chart-5: 280 60% 45%;
+
+    /* Сайдбар (якщо потрібно) */
     --sidebar-background: 0 0% 98%;
-    --sidebar-foreground: 240 5.3% 26.1%;
-    --sidebar-primary: 240 5.9% 10%;
-    --sidebar-primary-foreground: 0 0% 98%;
-    --sidebar-accent: 240 4.8% 95.9%;
-    --sidebar-accent-foreground: 240 5.9% 10%;
-    --sidebar-border: 220 13% 91%;
-    --sidebar-ring: 217.2 91.2% 59.8%;
+    --sidebar-foreground: 20 20% 10%;
+    --sidebar-primary: 120 45% 35%;
+    --sidebar-primary-foreground: 0 0% 100%;
+    --sidebar-accent: 30 25% 45%;
+    --sidebar-accent-foreground: 0 0% 100%;
+    --sidebar-border: 36 20% 90%;
+    --sidebar-ring: 120 45% 35%;
   }
 
   .dark {
-    --background: 224 71.4% 4.1%;
-    --foreground: 210 20% 98%;
-    --card: 224 71.4% 4.1%;
-    --card-foreground: 210 20% 98%;
-    --popover: 224 71.4% 4.1%;
-    --popover-foreground: 210 20% 98%;
-    --primary: 263.4 70% 50.4%;
-    --primary-foreground: 210 20% 98%;
-    --secondary: 215 27.9% 16.9%;
-    --secondary-foreground: 210 20% 98%;
-    --muted: 215 27.9% 16.9%;
-    --muted-foreground: 217.9 10.6% 64.9%;
-    --accent: 215 27.9% 16.9%;
-    --accent-foreground: 210 20% 98%;
-    --destructive: 0 62.8% 30.6%;
-    --destructive-foreground: 210 20% 98%;
-    --border: 215 27.9% 16.9%;
-    --input: 215 27.9% 16.9%;
-    --ring: 263.4 70% 50.4%;
-    --chart-1: 220 70% 50%;
-    --chart-2: 160 60% 45%;
-    --chart-3: 30 80% 55%;
-    --chart-4: 280 65% 60%;
-    --chart-5: 340 75% 55%;
-    --sidebar-background: 240 5.9% 10%;
-    --sidebar-foreground: 240 4.8% 95.9%;
-    --sidebar-primary: 224.3 76.3% 48%;
+    /* ========== Темна тема ========== */
+    --background: 20 20% 10%;          /* Темно-коричневий/шоколадний */
+    --foreground: 36 20% 90%;          /* Світлий кремовий текст */
+    --card: 20 20% 10%;
+    --card-foreground: 36 20% 90%;
+    --popover: 20 20% 10%;
+    --popover-foreground: 36 20% 90%;
+
+    /* Менш яскравий зелений */
+    --primary: 120 45% 35%;
+    --primary-foreground: 0 0% 100%;
+
+    /* Вторинний помаранчевий */
+    --secondary: 36 80% 60%;
+    --secondary-foreground: 0 0% 100%;
+
+    /* Приглушені відтінки */
+    --muted: 20 20% 15%;
+    --muted-foreground: 36 20% 80%;
+
+    /* Нейтральний акцент */
+    --accent: 30 25% 60%;                /* Трохи світліше для темної теми */
+    --accent-foreground: 0 0% 0%;        /* Чорний текст на світло-коричневому фоні */
+
+    /* «Небезпечний» колір */
+    --destructive: 0 70% 50%;
+    --destructive-foreground: 0 0% 100%;
+
+    /* Межі, інпути, кільце */
+    --border: 20 20% 15%;
+    --input: 20 20% 15%;
+    --ring: 120 45% 35%;
+
+    /* Кольори для графіків (за потреби коригуйте) */
+    --chart-1: 14 80% 55%;
+    --chart-2: 120 45% 35%;
+    --chart-3: 54 90% 60%;
+    --chart-4: 36 90% 60%;
+    --chart-5: 280 60% 45%;
+
+    /* Сайдбар */
+    --sidebar-background: 20 20% 10%;
+    --sidebar-foreground: 36 20% 90%;
+    --sidebar-primary: 120 45% 35%;
     --sidebar-primary-foreground: 0 0% 100%;
-    --sidebar-accent: 240 3.7% 15.9%;
-    --sidebar-accent-foreground: 240 4.8% 95.9%;
-    --sidebar-border: 240 3.7% 15.9%;
-    --sidebar-ring: 217.2 91.2% 59.8%;
+    --sidebar-accent: 30 25% 60%;
+    --sidebar-accent-foreground: 0 0% 0%;
+    --sidebar-border: 20 20% 15%;
+    --sidebar-ring: 120 45% 35%;
   }
 }
 

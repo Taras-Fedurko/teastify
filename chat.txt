@@ -93,6 +93,43 @@
 
 ## Project Structure
 
+### Admin Routes
+The application includes a comprehensive admin panel with the following sections:
+
+1. Dashboard (`/admin`)
+   - Main admin overview page
+   - Quick access to all administrative functions
+
+2. Users Management (`/admin/users`)
+   - User listing with data table
+   - Manage user accounts and permissions
+   - View and edit user profiles
+   - Handle user roles and access control
+
+3. Recipes Management (`/admin/recipes`)
+   - Recipe listing with data table
+   - Create, edit, and delete recipes
+   - Manage recipe status and visibility
+   - Track recipe metrics (views, favorites, ratings)
+
+4. Categories Management (`/admin/categories`)
+   - Category listing with data table
+   - Create and edit recipe categories
+   - Manage category metadata
+   - Control category organization
+
+5. Meal Plans Management (`/admin/meal-plans`)
+   - Meal plan listing with data table
+   - Review and manage user meal plans
+   - Monitor meal plan creation and usage
+   - Track meal plan statistics
+
+Each admin section features:
+- Data tables with sorting and filtering
+- Detailed column configurations
+- Action buttons for CRUD operations
+- Responsive layout for all screen sizes
+
 ### Database Schema
 The application uses a PostgreSQL database with the following models:
 

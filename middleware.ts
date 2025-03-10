@@ -15,7 +15,7 @@ const adminRoutes = Object.values(routes.admin);
 
 const { auth } = NextAuth(authConfig);
 
-export default auth(async (req) => {
+export default auth((req) => {
   const { nextUrl } = req;
   const isLoggedIn = !!req.auth;
   
