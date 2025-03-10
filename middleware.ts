@@ -13,19 +13,29 @@ import {
 // Get all admin routes from the routes configuration
 const adminRoutes = Object.values(routes.admin);
 
+// Define public API routes
+const publicApiRoutes = [
+  '/api/categories',
+  '/api/recipes',
+];
+
 const { auth } = NextAuth(authConfig);
 
 export default auth((req) => {
   const { nextUrl } = req;
   const isLoggedIn = !!req.auth;
   
-
   const isApiAuth = nextUrl.pathname.startsWith(apiAuthPrefix);
   const isPublicRoute = publicRoutes.includes(nextUrl.pathname);
+  const isPublicApiRoute = publicApiRoutes.some(route => nextUrl.pathname.startsWith(route));
   const isAuthRoute = authRoutes.includes(nextUrl.pathname);
   const isAdminRoute = adminRoutes.includes(nextUrl.pathname);
   
   if (isApiAuth) {
+    return;
+  }
+
+  if (isPublicApiRoute) {
     return;
   }
   
@@ -40,13 +50,10 @@ export default auth((req) => {
     return Response.redirect(new URL(routes.auth.signIn, nextUrl));
   }
 
-
   if (isAdminRoute) {    
     // TODO: Check if user is admin
-
     // return Response.redirect(new URL('/', nextUrl));
   }
-  
   
   return;
 });
