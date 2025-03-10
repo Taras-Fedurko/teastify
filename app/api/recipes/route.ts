@@ -3,6 +3,7 @@ import { auth } from '@/auth';
 import prisma from '@/lib/prisma';
 import { recipeSchema } from '@/lib/validations/recipe';
 import { z } from 'zod';
+import { Prisma } from '@prisma/client';
 
 export async function POST(req: Request) {
   try {
@@ -41,26 +42,46 @@ export async function GET(request: Request) {
   try {
     const { searchParams } = new URL(request.url);
     const page = parseInt(searchParams.get('page') ?? '1');
-    const limit = parseInt(searchParams.get('limit') ?? '10');
+    const limit = parseInt(searchParams.get('limit') ?? '12');
+    const search = searchParams.get('search') ?? '';
+    const category = searchParams.get('category') ?? '';
     const skip = (page - 1) * limit;
 
-    const recipes = await prisma.recipe.findMany({
-      skip,
-      take: limit,
-      include: {
-        category: true,
-        user: {
-          select: {
-            name: true,
+    const where: Prisma.RecipeWhereInput = {
+      AND: [
+        search ? {
+          OR: [
+            { title: { contains: search, mode: 'insensitive' } },
+            { description: { contains: search, mode: 'insensitive' } },
+          ],
+        } : {},
+        category ? {
+          category: {
+            slug: category
+          }
+        } : {}
+      ]
+    };
+
+    const [recipes, total] = await Promise.all([
+      prisma.recipe.findMany({
+        where,
+        skip,
+        take: limit,
+        include: {
+          category: true,
+          user: {
+            select: {
+              name: true,
+            },
           },
         },
-      },
-      orderBy: {
-        createdAt: 'desc',
-      },
-    });
-
-    const total = await prisma.recipe.count();
+        orderBy: {
+          createdAt: 'desc',
+        },
+      }),
+      prisma.recipe.count({ where }),
+    ]);
 
     return NextResponse.json({
       recipes,
